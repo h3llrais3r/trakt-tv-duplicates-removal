@@ -8,8 +8,10 @@ username = 'YOUR USERNAME'
 
 # Optional
 types = ['movies', 'episodes']  # 'movies' or 'episodes' or both
-keep_per_day = False        # set to True to keep one entry per day
-
+shows = []  # list of shows for which to remove duplicates, empty means remove duplicates for all shows
+movies = [] # list of movies which to remove duplicates, empty means remove duplicates for all movies
+keep_per_day = False  # set to True to keep one entry per day
+remove = False  # True will remove the duplicates, False will only do a dry run and list the duplicates
 
 # Don't edit the informations bellow
 trakt_api = 'https://api.trakt.tv'
@@ -97,15 +99,31 @@ def remove_duplicate(history, type):
     for i in history[::-1]:
         if i[entry_type]['ids']['trakt'] in entries:
             if not keep_per_day or i['watched_at'].split('T')[0] == entries.get(i[entry_type]['ids']['trakt']):
-                duplicates.append(i['id'])
+                if i[entry_type] == 'movie':
+                    if movies and len(movies) > 0:
+                        if i['movie']['title'] in movies:
+                            duplicates.append(i['id'])
+                            print('Duplicate found for %s' % (i['movie']['title']))
+                    else:
+                        duplicates.append(i['id'])
+                        print('Duplicate found for %s' % (i['movie']['title']))
+                if i[entry_type] == 'episode':
+                    if shows and len(shows) > 0:
+                        if i['show']['title'] in shows:
+                            duplicates.append(i['id'])
+                            print('Duplicate found for %s season %s episode %s' % (i['show']['title'], i['episode']['season'], i['episode']['number']))    
+                    else:
+                        duplicates.append(i['id'])
+                        print('Duplicate found for %s season %s episode %s' % (i['show']['title'], i['episode']['season'], i['episode']['number']))
         else:
             entries[i[entry_type]['ids']['trakt']] = i['watched_at'].split('T')[0]
 
     if len(duplicates) > 0:
         print('%s %s duplicates plays to be removed' % (len(duplicates), type))
 
-        session.post(sync_history_url, json={'ids': duplicates})
-        print('%s %s duplicates successfully removed!' % (len(duplicates), type))
+        if remove:
+            session.post(sync_history_url, json={'ids': duplicates})
+            print('%s %s duplicates successfully removed!' % (len(duplicates), type))
     else:
         print('No %s duplicates found' % type)
 
