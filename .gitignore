@@ -12,5 +12,6 @@ gen
 .venv
 
 # Backup files
-episodes.json
-movies.json
+movies*.json
+shows*.json
+episodes*.json
