@@ -1,5 +1,6 @@
 import json
 import requests
+import webbrowser
 
 # Edit the informations bellow
 client_id = 'YOUR CLIENT ID'
@@ -24,10 +25,8 @@ session = requests.Session()
 
 def login_to_trakt():
     print('Authentication')
-    print('Open the link in a browser and paste the pin')
-    print('https://trakt.tv/oauth/authorize?response_type=code&client_id=%s&redirect_uri=urn:ietf:wg:oauth:2.0:oob' % client_id)
-    print('')
-
+    print('Get the pin from the browser page and paste it here')
+    webbrowser.open_new('https://trakt.tv/oauth/authorize?response_type=code&client_id=%s&redirect_uri=urn:ietf:wg:oauth:2.0:oob' % client_id)
     pin = str(input('Pin: '))
 
     session.headers.update({
