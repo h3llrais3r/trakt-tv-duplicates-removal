@@ -171,6 +171,8 @@ def remove_duplicate(history, type):
             print('%s %s duplicates successfully removed!' % (len(duplicates), type))
     else:
         print('No %s duplicates found' % type)
+    
+    print()
 
 
 if __name__ == '__main__':
