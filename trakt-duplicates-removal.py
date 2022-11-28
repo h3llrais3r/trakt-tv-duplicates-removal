@@ -5,7 +5,6 @@ import webbrowser
 # Edit the informations bellow
 client_id = 'YOUR CLIENT ID'
 client_secret = 'YOUR CLIENT SECRET'
-username = 'YOUR USERNAME'
 
 # Optional
 types = ['movies', 'episodes']  # 'movies' or 'episodes' or both
@@ -17,8 +16,8 @@ remove = False  # True will remove the duplicates, False will only do a dry run 
 # Don't edit the informations bellow
 trakt_api = 'https://api.trakt.tv'
 auth_get_token_url = '%s/oauth/token' % trakt_api
-get_history_url = '%s/users/%s/history/{type}?page={page}&limit={limit}' % (trakt_api, username)
-sync_history_url = '%s/sync/history/remove' % trakt_api
+get_history_url = '%s/sync/history/{type}?page={page}&limit={limit}' % trakt_api
+remove_history_url = '%s/sync/history/remove' % trakt_api
 get_watched_movies_url = '%s/sync/watched/movies' % trakt_api
 get_watched_shows_url = '%s/sync/watched/shows' % trakt_api
 
@@ -64,11 +63,8 @@ def get_watched_movies():
 
     print('Retrieving watched movies')
     resp = session.get(get_watched_movies_url)
-
-    if resp.status_code != 200:
-        print(resp)
-
     results = resp.json()
+    
     with open('movies_watched.json', 'w') as output:
             json.dump(results, output, indent=4)
             print('Watched movies saved in file movies_watched.json')
@@ -82,9 +78,6 @@ def get_watched_shows():
 
     print('Retrieving watched shows')
     resp = session.get(get_watched_shows_url)
-
-    if resp.status_code != 200:
-        print(resp)
 
     results = resp.json()
     with open('shows_watched.json', 'w') as output:
@@ -167,7 +160,7 @@ def remove_duplicate(history, type):
         print('%s %s duplicates plays to be removed' % (len(duplicates), type))
 
         if remove:
-            session.post(sync_history_url, json={'ids': duplicates})
+            session.post(remove_history_url, json={'ids': duplicates})
             print('%s %s duplicates successfully removed!' % (len(duplicates), type))
     else:
         print('No %s duplicates found' % type)
